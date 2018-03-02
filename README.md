@@ -80,3 +80,27 @@ Having delimiters would allow statements to be compatible with `then`, but it co
 
 ## What is the difference to `await`?
 The purpose of this operator is be able to modify a promise asynchronously. It's not meant to wait for a resolution before continuing. For this reason, the `then` operator doesn't need to be restricted to `async` functions.
+
+
+## More examples
+```js
+// Creating promises form values
+let x = then 1
+let x = Promise.resolve(1)
+
+// Creating rejections from errors
+let err = then (throw new Error('problems!'))
+let err = Promise.reject(new Error('problems!'))
+
+// Creating arrays
+let list = [then a, then b, then c]
+let list = Promise.all([a, b, c])
+
+// Creating objects
+let ellipse = { a: then major, b: then minor }
+let ellipse = Promise.all([major, minor]).then(([a, b]) => ({ a, b }))
+
+// Closures
+let addItem = item => (then items).push(item)
+let addItem = item => items.then(_items => _items.push(item)) // note: body of function is cutoff point
+```
