@@ -26,7 +26,7 @@ let area = Promise.all([getWidth(), getLength()]).then(([width, length]) => widt
 Or alternatively like:
 ```js
 let area = (async () => {
-  // execute the arguments once asynchronously
+  // execute the operands once asynchronously
   let width = getWidth()
   let length = getLength()
   // replace then with await 
@@ -34,8 +34,41 @@ let area = (async () => {
 })()
 ```
 
-## Detailed explanation
-The `then` operator notifies its top level expression that it has then dependencies.
-Any top level expression with dependencies is converted to an immediately invoked async function expression.
-This iiafe executes each 'then' operator's argument, storing them as promises.
-The iiafe returns an expression similar to the original top level expression, but `then [[argument]]`s are changed to corresponding `await [[promise]]`.
+## Explanation
+When a "top level expression" contains one or more `then` operators, it will first evaluate all of the operands. It an operand results in a non-promise, it will convert it to a promise via `Promise.resolve`. When all of the operand promises resolve, we execute the expression with each `then` expression swapped with their respective resolved value.
+
+## Cuttoff point and expressions vs statements
+There needs to be some "top level expressison" that is ultimately converted to a promise.
+
+For example it would be bad if the following:
+```js
+notDone = ! then isDone()
+```
+were treated as:
+```js
+isDone().then(done => notDone = !done)
+```
+since it would be preferable that variables be bound in current scope. What would be desired is:
+```js
+notDone = isDone().then(done => !done)
+```
+Thus in determining what would be the "top level expression", it is best not to go higher than the right hand side of an assignment.
+
+When it comes to statements such as:
+```js
+if (then ready) {
+  doStuff()
+}
+```
+at first it would seem desirable to treat it as:
+```js
+ready.then(ready => {
+  if (ready) {
+    doStuff()
+  }
+})
+```
+but it would cause a lot of confusion if the conditional statement was followed by `doMoreStuff()` which depended on the execution `doStuff()`, the result would be undesirable behavior. Thus it would be better to keep things at the expression level. 
+
+## What is the difference to `await`?
+The purpose of this operator is be able to modify a promise asynchronously. It's not meant to wait for a resolution before continuing. For this reason, the `then` operator doesn't need to be restricted to `async` functions.
