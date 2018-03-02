@@ -3,7 +3,7 @@
 ## Description
 The `then` operator is a unary operator for promises, which allows the promise to be treated as if it were its resolved value. The result of any manipulation would be a new promise.
 
-## Example
+## Examples
 ```js
 let count = Promise.resolve(5)
 let doubledCount = then count * 2 // doubledCount is a promise resolving to 5 * 2
@@ -17,15 +17,21 @@ doubledCount.then(x => console.log(x))
 ```
 We could also allow multiple `then`s in a single expression.
 ```js
-let area = then width * then length
+let area = then getWidth() * then getLength()
 ```
 Which would behave like:
 ```js
-let area = Promise.all([width, length]).then(([width, length]) => width * length)
+let area = Promise.all([getWidth(), getLength()]).then(([width, length]) => width * length)
 ```
 Or alternatively like:
 ```js
-let area = (async () => await width * await length)()
+let area = (async () => {
+  // execute the arguments once asynchronously
+  let width = getWidth()
+  let length = getLength()
+  // replace then with await 
+  return await width * await length
+})()
 ```
 
 ## Detailed explanation
