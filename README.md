@@ -37,7 +37,7 @@ let area = (async () => {
 ## Explanation
 When a "top level expression" contains one or more `then` operators, it will first evaluate all of the operands. It an operand results in a non-promise, it will convert it to a promise via `Promise.resolve`. When all of the operand promises resolve, we execute the expression with each `then` expression swapped with their respective resolved value.
 
-## Cuttoff point and expressions vs statements
+## Cutoff point and expressions vs statements
 There needs to be some "top level expressison" that is ultimately converted to a promise.
 
 For example it would be bad if the following:
